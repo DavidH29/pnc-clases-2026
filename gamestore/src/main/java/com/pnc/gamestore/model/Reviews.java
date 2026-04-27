@@ -12,7 +12,7 @@ public class Reviews {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "player")
     private String user;
 
     @Column
