@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -24,5 +25,10 @@ public class GameService {
 
     public void createGame(Game game) {
         gameRepository.save(game);
+    }
+
+    public Game getById(UUID id) {
+        Optional<Game> game = gameRepository.findById(id);
+        return game.isPresent() ? game.get() : null;
     }
 }

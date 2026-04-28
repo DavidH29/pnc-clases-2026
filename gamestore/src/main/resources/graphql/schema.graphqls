@@ -30,12 +30,12 @@ type Reviews {
 
 type Query {
     allGames: [Game!]!
-    gameById(id: Int!): Game
+    gameById(id: String!): Game
 
     gamesByGenre(genre: String!): [Game!]!
     searchGames(name: String!): [Game!]!
 
     allPlatforms: [Platforms!]!
 
-    reviewsByGame(gameId: Int!): [Reviews!]!
+    reviewsByGame(gameId: String!): [Reviews!]!
 }
