@@ -1,5 +1,7 @@
 package com.pnc.gamestore.model;
 
+import com.pnc.gamestore.model.enums.Classification;
+import com.pnc.gamestore.model.enums.Genre;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -15,22 +17,26 @@ public class Game {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
 
-    @Column
-    private String genre;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Classification classification;
 
-    @Column
-    private String classification;
+    @ElementCollection(targetClass = Genre.class)
+    @CollectionTable(name = "game_genres", joinColumns = @JoinColumn(name = "game_id"))
+    @Enumerated(EnumType.STRING)
+    @Column(name = "genre")
+    private List<Genre> genres = new ArrayList<>();
 
-    @Column(name = "game_developer")
+    @Column(nullable = false)
     private String dev;
 
-    @OneToOne(mappedBy = "game")
+    @OneToOne(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
     private GameDetails details;
 
-    @OneToMany(mappedBy = "game")
+    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reviews> reviews = new ArrayList<>();
 
     @ManyToMany
@@ -41,13 +47,12 @@ public class Game {
     )
     private List<Platforms> platforms = new ArrayList<>();
 
-    public Game() {
-    }
+    public Game() {}
 
-    public Game(String name, String genre, String classification, String dev) {
+    public Game(String name, Classification classification, List<Genre> genres, String dev) {
         this.name = name;
-        this.genre = genre;
         this.classification = classification;
+        this.genres = genres;
         this.dev = dev;
     }
 
@@ -67,20 +72,20 @@ public class Game {
         this.name = name;
     }
 
-    public String getGenre() {
-        return genre;
-    }
-
-    public void setGenre(String genre) {
-        this.genre = genre;
-    }
-
-    public String getClassification() {
+    public Classification getClassification() {
         return classification;
     }
 
-    public void setClassification(String classification) {
+    public void setClassification(Classification classification) {
         this.classification = classification;
+    }
+
+    public List<Genre> getGenres() {
+        return genres;
+    }
+
+    public void setGenres(List<Genre> genres) {
+        this.genres = genres;
     }
 
     public String getDev() {
