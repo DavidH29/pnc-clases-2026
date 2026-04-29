@@ -30,7 +30,7 @@ public class Game {
     @Column(name = "genre")
     private List<Genre> genres = new ArrayList<>();
 
-    @Column(nullable = false)
+    @Column(name = "game_developer",nullable = false)
     private String dev;
 
     @OneToOne(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)

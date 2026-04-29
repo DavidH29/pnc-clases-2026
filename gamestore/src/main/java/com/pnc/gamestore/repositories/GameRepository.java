@@ -13,7 +13,7 @@ public interface GameRepository extends JpaRepository<Game, UUID> {
     Optional<Game> findById(UUID id);
     List<Game> findByDev(String dev);
     List<Game> findByDevAndClassification(String dev, String classification);
-    List<Game> findByGenre(String genre);
+    List<Game> findByGenres(String genre);
     Optional<Game> findByName(String name);
     boolean existsByName(String name);
 }
