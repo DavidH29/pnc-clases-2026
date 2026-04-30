@@ -1,5 +1,6 @@
 package com.pnc.gamestore.model;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.pnc.gamestore.model.enums.Classification;
 import com.pnc.gamestore.model.enums.Genre;
 import jakarta.persistence.*;

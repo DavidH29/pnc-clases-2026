@@ -1,0 +1,442 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-04-29T12:00:00.000Z",
+  "__export_source": "insomnia.game-store",
+  "resources": [
+    {
+      "_id": "wrk_game_store",
+      "parentId": null,
+      "modified": 1714400000000,
+      "created": 1714400000000,
+      "name": "Game Store API",
+      "description": "CRUD for games, platforms, and reviews",
+      "scope": "collection",
+      "_type": "workspace"
+    },
+    {
+      "_id": "fld_games",
+      "parentId": "wrk_game_store",
+      "modified": 1714400000000,
+      "created": 1714400000000,
+      "name": "Games",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1714400000000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_games_get_all",
+      "parentId": "fld_games",
+      "modified": 1714400000000,
+      "created": 1714400000000,
+      "url": "{{ base_url }}/games",
+      "name": "List all games",
+      "description": "",
+      "method": "GET",
+      "body": null,
+      "parameters": [],
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "authentication": {},
+      "metaSortKey": -1714400000000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_games_get_by_id",
+      "parentId": "fld_games",
+      "modified": 1714400001000,
+      "created": 1714400001000,
+      "url": "{{ base_url }}/games/{{ game_id }}",
+      "name": "Get game by ID",
+      "description": "",
+      "method": "GET",
+      "body": null,
+      "parameters": [],
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "authentication": {},
+      "metaSortKey": -1714400001000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_games_post",
+      "parentId": "fld_games",
+      "modified": 1714400002000,
+      "created": 1714400002000,
+      "url": "{{ base_url }}/games",
+      "name": "Create game",
+      "description": "",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"New Game\",\n  \"classification\": \"E10\",\n  \"genres\": [\"ADVENTURE\", \"PUZZLE\"],\n  \"dev\": \"Some Studio\",\n  \"platforms\": [\n    { \"id\": \"a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11\" }\n  ],\n  \"details\": {\n    \"about\": \"A new adventure game\",\n    \"publishYear\": 2025\n  }\n}"
+      },
+      "parameters": [],
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "authentication": {},
+      "metaSortKey": -1714400002000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_games_put",
+      "parentId": "fld_games",
+      "modified": 1714400003000,
+      "created": 1714400003000,
+      "url": "{{ base_url }}/games/{{ game_id }}",
+      "name": "Update game",
+      "description": "",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Updated Game Name\",\n  \"classification\": \"T\",\n  \"genres\": [\"SHOOTER\"],\n  \"dev\": \"Another Studio\",\n  \"platforms\": [\n    { \"id\": \"b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12\" }\n  ],\n  \"details\": {\n    \"about\": \"Updated description\",\n    \"publishYear\": 2026\n  }\n}"
+      },
+      "parameters": [],
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "authentication": {},
+      "metaSortKey": -1714400003000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_games_delete",
+      "parentId": "fld_games",
+      "modified": 1714400004000,
+      "created": 1714400004000,
+      "url": "{{ base_url }}/games/{{ game_id }}",
+      "name": "Delete game",
+      "description": "",
+      "method": "DELETE",
+      "body": null,
+      "parameters": [],
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "authentication": {},
+      "metaSortKey": -1714400004000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_platforms",
+      "parentId": "wrk_game_store",
+      "modified": 1714400000000,
+      "created": 1714400000000,
+      "name": "Platforms",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1714399999999,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_platforms_get_all",
+      "parentId": "fld_platforms",
+      "modified": 1714400005000,
+      "created": 1714400005000,
+      "url": "{{ base_url }}/platforms",
+      "name": "List all platforms",
+      "description": "",
+      "method": "GET",
+      "body": null,
+      "parameters": [],
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "authentication": {},
+      "metaSortKey": -1714400005000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_platforms_get_by_id",
+      "parentId": "fld_platforms",
+      "modified": 1714400006000,
+      "created": 1714400006000,
+      "url": "{{ base_url }}/platforms/{{ platform_id }}",
+      "name": "Get platform by ID",
+      "description": "",
+      "method": "GET",
+      "body": null,
+      "parameters": [],
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "authentication": {},
+      "metaSortKey": -1714400006000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_platforms_post",
+      "parentId": "fld_platforms",
+      "modified": 1714400007000,
+      "created": 1714400007000,
+      "url": "{{ base_url }}/platforms",
+      "name": "Create platform",
+      "description": "",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"New Platform\",\n  \"company\": \"Some Company\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "authentication": {},
+      "metaSortKey": -1714400007000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_platforms_put",
+      "parentId": "fld_platforms",
+      "modified": 1714400008000,
+      "created": 1714400008000,
+      "url": "{{ base_url }}/platforms/{{ platform_id }}",
+      "name": "Update platform",
+      "description": "",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Updated Platform\",\n  \"company\": \"Updated Company\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "authentication": {},
+      "metaSortKey": -1714400008000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_platforms_delete",
+      "parentId": "fld_platforms",
+      "modified": 1714400009000,
+      "created": 1714400009000,
+      "url": "{{ base_url }}/platforms/{{ platform_id }}",
+      "name": "Delete platform",
+      "description": "",
+      "method": "DELETE",
+      "body": null,
+      "parameters": [],
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "authentication": {},
+      "metaSortKey": -1714400009000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_reviews",
+      "parentId": "wrk_game_store",
+      "modified": 1714400000000,
+      "created": 1714400000000,
+      "name": "Reviews",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1714399999998,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_reviews_get_by_game",
+      "parentId": "fld_reviews",
+      "modified": 1714400010000,
+      "created": 1714400010000,
+      "url": "{{ base_url }}/reviews/game/{{ game_id }}",
+      "name": "Get reviews for a game",
+      "description": "",
+      "method": "GET",
+      "body": null,
+      "parameters": [],
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "authentication": {},
+      "metaSortKey": -1714400010000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_reviews_post",
+      "parentId": "fld_reviews",
+      "modified": 1714400011000,
+      "created": 1714400011000,
+      "url": "{{ base_url }}/reviews/game/{{ game_id }}",
+      "name": "Create a review for a game",
+      "description": "",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"user\": \"MyUser\",\n  \"rating\": 4,\n  \"comment\": \"Great game!\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "authentication": {},
+      "metaSortKey": -1714400011000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_reviews_put",
+      "parentId": "fld_reviews",
+      "modified": 1714400012000,
+      "created": 1714400012000,
+      "url": "{{ base_url }}/reviews/{{ review_id }}",
+      "name": "Update a review",
+      "description": "",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"rating\": 5,\n  \"comment\": \"Updated comment\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "authentication": {},
+      "metaSortKey": -1714400012000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_reviews_delete",
+      "parentId": "fld_reviews",
+      "modified": 1714400013000,
+      "created": 1714400013000,
+      "url": "{{ base_url }}/reviews/{{ review_id }}",
+      "name": "Delete a review",
+      "description": "",
+      "method": "DELETE",
+      "body": null,
+      "parameters": [],
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "authentication": {},
+      "metaSortKey": -1714400013000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "env_base",
+      "parentId": "wrk_game_store",
+      "modified": 1714400000000,
+      "created": 1714400000000,
+      "name": "Base Environment",
+      "data": {
+        "base_url": "http://localhost:8080",
+        "game_id": "a97869ad-eac3-4d32-9dcc-bb4d146e7f33",
+        "platform_id": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+        "review_id": "d0eebc99-9c0b-4ef8-bb6d-6bb9bd380a14"
+      },
+      "dataPropertyOrder": {
+        "&": ["base_url", "game_id", "platform_id", "review_id"]
+      },
+      "color": null,
+      "isPrivate": false,
+      "metaSortKey": 0,
+      "_type": "environment"
+    }
+  ]
+}
