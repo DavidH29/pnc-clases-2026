@@ -30,4 +30,36 @@ public class GameDetails {
         this.about = about;
         this.publishYear = publishYear;
     }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public String getAbout() {
+        return about;
+    }
+
+    public void setAbout(String about) {
+        this.about = about;
+    }
+
+    public Integer getPublishYear() {
+        return publishYear;
+    }
+
+    public void setPublishYear(Integer publishYear) {
+        this.publishYear = publishYear;
+    }
+
+    public Game getGame() {
+        return game;
+    }
+
+    public void setGame(Game game) {
+        this.game = game;
+    }
 }

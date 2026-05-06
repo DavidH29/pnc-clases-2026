@@ -10,8 +10,10 @@ import java.util.UUID;
 
 @Repository
 public interface GameRepository extends JpaRepository<Game, UUID> {
-    public Optional<Game> findById(UUID id);
-    public List<Game> findByDev(String dev);
-    public List<Game> findByDevAndClassification(String dev, String classification);
-    public List<Game> findByGenre(String genre);
+    Optional<Game> findById(UUID id);
+    List<Game> findByDev(String dev);
+    List<Game> findByDevAndClassification(String dev, String classification);
+    List<Game> findByGenres(String genre);
+    Optional<Game> findByName(String name);
+    boolean existsByName(String name);
 }
