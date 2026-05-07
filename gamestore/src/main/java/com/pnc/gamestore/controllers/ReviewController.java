@@ -1,7 +1,9 @@
 package com.pnc.gamestore.controllers;
 
-import com.pnc.gamestore.model.Reviews;
+import com.pnc.gamestore.dto.request.ReviewRequest;
+import com.pnc.gamestore.dto.response.ReviewResponse;
 import com.pnc.gamestore.services.ReviewService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("reviews")
+@RequestMapping("/reviews")
 public class ReviewController {
 
     private final ReviewService reviewService;
@@ -19,25 +21,25 @@ public class ReviewController {
     }
 
     @GetMapping("/game/{gameId}")
-    public ResponseEntity<List<Reviews>> getReviewsByGame(@PathVariable UUID gameId) {
+    public ResponseEntity<List<ReviewResponse>> getReviewsByGame(@PathVariable UUID gameId) {
         return ResponseEntity.ok(reviewService.getReviewsByGame(gameId));
     }
 
     @PostMapping("/game/{gameId}")
-    public ResponseEntity<Void> createReview(@PathVariable UUID gameId, @RequestBody Reviews review) {
-        Reviews saved = reviewService.createReview(gameId, review);
-        return saved != null ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
+    public ResponseEntity<ReviewResponse> createReview(@PathVariable UUID gameId,
+                                                        @Valid @RequestBody ReviewRequest request) {
+        return ResponseEntity.ok(reviewService.createReview(gameId, request));
     }
 
     @PutMapping("/{reviewId}")
-    public ResponseEntity<Void> updateReview(@PathVariable UUID reviewId, @RequestBody Reviews review) {
-        Reviews updated = reviewService.updateReview(reviewId, review);
-        return updated != null ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
+    public ResponseEntity<ReviewResponse> updateReview(@PathVariable UUID reviewId,
+                                                        @Valid @RequestBody ReviewRequest request) {
+        return ResponseEntity.ok(reviewService.updateReview(reviewId, request));
     }
 
     @DeleteMapping("/{reviewId}")
     public ResponseEntity<Void> deleteReview(@PathVariable UUID reviewId) {
-        Reviews deleted = reviewService.deleteReview(reviewId);
-        return deleted != null ? ResponseEntity.noContent().build() : ResponseEntity.badRequest().build();
+        reviewService.deleteReview(reviewId);
+        return ResponseEntity.noContent().build();
     }
 }

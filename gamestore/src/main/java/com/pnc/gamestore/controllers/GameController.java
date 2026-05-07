@@ -1,10 +1,9 @@
 package com.pnc.gamestore.controllers;
 
-import com.pnc.gamestore.model.Game;
-import com.pnc.gamestore.model.enums.Genre;
+import com.pnc.gamestore.dto.request.GameRequest;
+import com.pnc.gamestore.dto.response.GameResponse;
 import com.pnc.gamestore.services.GameService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
+import jakarta.validation.Valid;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.http.ResponseEntity;
@@ -14,8 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
-@RestController()
-@RequestMapping("game")
+@RestController
+@RequestMapping("/game")
 public class GameController {
 
     private final GameService gameService;
@@ -25,53 +24,39 @@ public class GameController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Game>> getAll() {
+    public ResponseEntity<List<GameResponse>> getAll() {
         return ResponseEntity.ok(gameService.getAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Game> getById(@PathVariable UUID id) {
-        Game game = gameService.getById(id);
-        if (game == null) {
-            return ResponseEntity.badRequest().build();
-        }
-        return ResponseEntity.ok(game);
+    public ResponseEntity<GameResponse> getById(@PathVariable UUID id) {
+        return ResponseEntity.ok(gameService.getById(id));
     }
 
     @PostMapping
-    public ResponseEntity<Void> createGame(@RequestBody Game game) {
-        Game saved = gameService.createGame(game);
-        if (saved == null) {
-            return ResponseEntity.badRequest().build();
-        }
-        return ResponseEntity.ok().build();
+    public ResponseEntity<GameResponse> createGame(@Valid @RequestBody GameRequest request) {
+        return ResponseEntity.ok(gameService.createGame(request));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateGame(@PathVariable UUID id, @RequestBody Game game) {
-        Game updated = gameService.updateGame(id, game);
-        if (updated == null) {
-            return ResponseEntity.badRequest().build();
-        }
-        return ResponseEntity.ok().build();
+    public ResponseEntity<GameResponse> updateGame(@PathVariable UUID id,
+                                                    @Valid @RequestBody GameRequest request) {
+        return ResponseEntity.ok(gameService.updateGame(id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteGame(@PathVariable UUID id) {
-        Game deleted = gameService.deleteGame(id);
-        if (deleted == null) {
-            return ResponseEntity.badRequest().build();
-        }
+        gameService.deleteGame(id);
         return ResponseEntity.noContent().build();
     }
 
     @QueryMapping
-    public List<Game> allGames() {
+    public List<GameResponse> allGames() {
         return gameService.getAll();
     }
 
     @QueryMapping
-    public Game gameById(@Argument UUID id) {
+    public GameResponse gameById(@Argument UUID id) {
         return gameService.getById(id);
     }
 }

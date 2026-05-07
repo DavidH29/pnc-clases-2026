@@ -1,7 +1,9 @@
 package com.pnc.gamestore.controllers;
 
-import com.pnc.gamestore.model.Platforms;
+import com.pnc.gamestore.dto.request.PlatformRequest;
+import com.pnc.gamestore.dto.response.PlatformResponse;
 import com.pnc.gamestore.services.PlatformService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("platforms")
+@RequestMapping("/platforms")
 public class PlatformController {
 
     private final PlatformService platformService;
@@ -19,31 +21,29 @@ public class PlatformController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Platforms>> getAll() {
+    public ResponseEntity<List<PlatformResponse>> getAll() {
         return ResponseEntity.ok(platformService.getAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Platforms> getById(@PathVariable UUID id) {
-        Platforms p = platformService.getById(id);
-        return p != null ? ResponseEntity.ok(p) : ResponseEntity.badRequest().build();
+    public ResponseEntity<PlatformResponse> getById(@PathVariable UUID id) {
+        return ResponseEntity.ok(platformService.getById(id));
     }
 
     @PostMapping
-    public ResponseEntity<Void> createPlatform(@RequestBody Platforms platform) {
-        Platforms saved = platformService.createPlatform(platform);
-        return saved != null ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
+    public ResponseEntity<PlatformResponse> createPlatform(@Valid @RequestBody PlatformRequest request) {
+        return ResponseEntity.ok(platformService.createPlatform(request));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updatePlatform(@PathVariable UUID id, @RequestBody Platforms platform) {
-        Platforms updated = platformService.updatePlatform(id, platform);
-        return updated != null ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
+    public ResponseEntity<PlatformResponse> updatePlatform(@PathVariable UUID id,
+                                                            @Valid @RequestBody PlatformRequest request) {
+        return ResponseEntity.ok(platformService.updatePlatform(id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePlatform(@PathVariable UUID id) {
-        Platforms deleted = platformService.deletePlatform(id);
-        return deleted != null ? ResponseEntity.noContent().build() : ResponseEntity.badRequest().build();
+        platformService.deletePlatform(id);
+        return ResponseEntity.noContent().build();
     }
 }

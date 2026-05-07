@@ -1,15 +1,21 @@
 package com.pnc.gamestore.services;
 
+import com.pnc.gamestore.dto.request.GameRequest;
+import com.pnc.gamestore.dto.response.GameResponse;
+import com.pnc.gamestore.exception.BusinessRuleException;
+import com.pnc.gamestore.exception.DuplicateEntityException;
+import com.pnc.gamestore.exception.EntityNotFoundException;
+import com.pnc.gamestore.filter.AuthContext;
 import com.pnc.gamestore.model.Game;
 import com.pnc.gamestore.model.GameDetails;
 import com.pnc.gamestore.model.Platforms;
+import com.pnc.gamestore.model.User;
 import com.pnc.gamestore.model.enums.Classification;
-import com.pnc.gamestore.model.enums.Genre;
 import com.pnc.gamestore.repositories.GameRepository;
 import com.pnc.gamestore.repositories.PlatformsRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.time.Year;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -25,158 +31,175 @@ public class GameService {
         this.platformsRepository = platformsRepository;
     }
 
-    public List<Game> getAll() {
-        return gameRepository.findAll();
-    }
-
-    public Game getById(UUID id) {
-        return gameRepository.findById(id).orElse(null);
-    }
-
-    public List<Game> findByGenre(Genre genre) {
+    public List<GameResponse> getAll() {
         return gameRepository.findAll().stream()
-                .filter(g -> g.getGenres().contains(genre))
+                .map(this::toResponse)
                 .collect(Collectors.toList());
     }
 
-    public Game createGame(Game game) {
-        if (game.getName() == null || game.getName().isBlank() ||
-                gameRepository.existsByName(game.getName())) {
-            return null;
-        }
-
-        if (game.getDev() == null || game.getDev().isBlank()) {
-            return null;
-        }
-
-        if (game.getClassification() == null) {
-            return null;
-        }
-
-        if (game.getPlatforms() == null || game.getPlatforms().isEmpty()) {
-            return null;
-        }
-
-        Set<UUID> ids = new HashSet<>();
-        for (Platforms p : game.getPlatforms()) {
-            if (p.getId() == null || !ids.add(p.getId())) {
-                return null;
-            }
-        }
-
-        List<Platforms> managedPlatforms = new ArrayList<>();
-        for (Platforms p : game.getPlatforms()) {
-            Optional<Platforms> opt = platformsRepository.findById(p.getId());
-            if (opt.isEmpty()) {
-                return null;
-            }
-            managedPlatforms.add(opt.get());
-        }
-        game.setPlatforms(managedPlatforms);
-
-        if (game.getClassification() == Classification.M) {
-            boolean nintendo = managedPlatforms.stream()
-                    .anyMatch(p -> p.getCompany() != null
-                            && p.getCompany().equalsIgnoreCase("nintendo"));
-            if (nintendo) {
-                return null;
-            }
-        }
-
-        if (game.getDetails() != null) {
-            GameDetails details = game.getDetails();
-            if (details.getPublishYear() != null) {
-                int currentYear = Year.now().getValue();
-                if (details.getPublishYear() < 1975 || details.getPublishYear() > currentYear) {
-                    return null;
-                }
-            }
-        }
-
-        return gameRepository.save(game);
+    public GameResponse getById(UUID id) {
+        Game game = gameRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Game", id));
+        return toResponse(game);
     }
 
-    public Game updateGame(UUID id, Game gameData) {
-        Optional<Game> existingOpt = gameRepository.findById(id);
-        if (existingOpt.isEmpty()) {
-            return null;
-        }
-        Game existing = existingOpt.get();
-
-        if (!existing.getName().equals(gameData.getName())) {
-            if (gameRepository.existsByName(gameData.getName())) {
-                return null;
-            }
+    public GameResponse createGame(GameRequest request) {
+        if (gameRepository.existsByName(request.getName())) {
+            throw new DuplicateEntityException("Game", "name", request.getName());
         }
 
-        if (gameData.getName() == null || gameData.getName().isBlank() ||
-                gameData.getDev() == null || gameData.getDev().isBlank() ||
-                gameData.getClassification() == null) {
-            return null;
+        List<Platforms> platforms = resolvePlatforms(request.getPlatformIds());
+
+        if (request.getClassification() == Classification.M) {
+            boolean hasNintendo = platforms.stream()
+                    .anyMatch(p -> "nintendo".equalsIgnoreCase(p.getCompany()));
+            if (hasNintendo) {
+                throw new BusinessRuleException(
+                        "M-rated games cannot be assigned to Nintendo platforms");
+            }
         }
 
-        if (gameData.getPlatforms() != null && !gameData.getPlatforms().isEmpty()) {
-            Set<UUID> ids = new HashSet<>();
-            for (Platforms p : gameData.getPlatforms()) {
-                if (p.getId() == null || !ids.add(p.getId())) {
-                    return null;
-                }
+        if (request.getDetails() != null && request.getDetails().getPublishYear() != null) {
+            int currentYear = Year.now().getValue();
+            if (request.getDetails().getPublishYear() > currentYear) {
+                throw new BusinessRuleException("Publish year cannot be in the future");
             }
-            List<Platforms> managed = new ArrayList<>();
-            for (Platforms p : gameData.getPlatforms()) {
-                Optional<Platforms> opt = platformsRepository.findById(p.getId());
-                if (opt.isEmpty()) {
-                    return null;
-                }
-                managed.add(opt.get());
-            }
-            if (gameData.getClassification() == Classification.M) {
-                boolean nintendo = managed.stream()
-                        .anyMatch(p -> p.getCompany() != null && p.getCompany().equalsIgnoreCase("nintendo"));
-                if (nintendo) {
-                    return null;
-                }
-            }
-            existing.getPlatforms().clear();
-            existing.getPlatforms().addAll(managed);
-        } else {
-            return null;
         }
 
-        if (gameData.getDetails() != null) {
-            GameDetails newDetail = gameData.getDetails();
-            if (newDetail.getPublishYear() != null) {
-                int currentYear = Year.now().getValue();
-                if (newDetail.getPublishYear() < 1975 || newDetail.getPublishYear() > currentYear) {
-                    return null;
-                }
+        User actor = AuthContext.getUser();
+        LocalDateTime now = LocalDateTime.now();
+
+        Game game = new Game(
+                request.getName(),
+                request.getClassification(),
+                request.getGenres() != null ? request.getGenres() : new ArrayList<>(),
+                request.getDev()
+        );
+        game.setPlatforms(platforms);
+        game.setCreatedAt(now);
+        game.setCreatedBy(actor);
+
+        if (request.getDetails() != null) {
+            GameDetails details = new GameDetails(
+                    request.getDetails().getAbout(),
+                    request.getDetails().getPublishYear()
+            );
+            details.setGame(game);
+            details.setCreatedAt(now);
+            details.setCreatedBy(actor);
+            game.setDetails(details);
+        }
+
+        return toResponse(gameRepository.save(game));
+    }
+
+    public GameResponse updateGame(UUID id, GameRequest request) {
+        Game existing = gameRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Game", id));
+
+        if (!existing.getName().equals(request.getName()) &&
+                gameRepository.existsByName(request.getName())) {
+            throw new DuplicateEntityException("Game", "name", request.getName());
+        }
+
+        List<Platforms> platforms = resolvePlatforms(request.getPlatformIds());
+
+        if (request.getClassification() == Classification.M) {
+            boolean hasNintendo = platforms.stream()
+                    .anyMatch(p -> "nintendo".equalsIgnoreCase(p.getCompany()));
+            if (hasNintendo) {
+                throw new BusinessRuleException(
+                        "M-rated games cannot be assigned to Nintendo platforms");
             }
+        }
+
+        if (request.getDetails() != null && request.getDetails().getPublishYear() != null) {
+            int currentYear = Year.now().getValue();
+            if (request.getDetails().getPublishYear() > currentYear) {
+                throw new BusinessRuleException("Publish year cannot be in the future");
+            }
+        }
+
+        User actor = AuthContext.getUser();
+        LocalDateTime now = LocalDateTime.now();
+
+        existing.setName(request.getName());
+        existing.setDev(request.getDev());
+        existing.setClassification(request.getClassification());
+        existing.setGenres(request.getGenres() != null ? request.getGenres() : new ArrayList<>());
+        existing.getPlatforms().clear();
+        existing.getPlatforms().addAll(platforms);
+        existing.setUpdatedAt(now);
+        existing.setUpdatedBy(actor);
+
+        if (request.getDetails() != null) {
             if (existing.getDetails() == null) {
-                existing.setDetails(newDetail);
-                newDetail.setGame(existing);
+                GameDetails details = new GameDetails(
+                        request.getDetails().getAbout(),
+                        request.getDetails().getPublishYear()
+                );
+                details.setGame(existing);
+                details.setCreatedAt(now);
+                details.setCreatedBy(actor);
+                existing.setDetails(details);
             } else {
-                existing.getDetails().setAbout(newDetail.getAbout());
-                existing.getDetails().setPublishYear(newDetail.getPublishYear());
+                existing.getDetails().setAbout(request.getDetails().getAbout());
+                existing.getDetails().setPublishYear(request.getDetails().getPublishYear());
+                existing.getDetails().setUpdatedAt(now);
+                existing.getDetails().setUpdatedBy(actor);
             }
         } else {
             existing.setDetails(null);
         }
 
-        existing.setName(gameData.getName());
-        existing.setDev(gameData.getDev());
-        existing.setClassification(gameData.getClassification());
-        existing.setGenres(gameData.getGenres());
-
-        return gameRepository.save(existing);
+        return toResponse(gameRepository.save(existing));
     }
 
+    public void deleteGame(UUID id) {
+        Game game = gameRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Game", id));
+        gameRepository.delete(game);
+    }
 
-    public Game deleteGame(UUID id) {
-        Optional<Game> gameOpt = gameRepository.findById(id);
-        if (gameOpt.isPresent()) {
-            gameRepository.delete(gameOpt.get());
-            return gameOpt.get();
+    private List<Platforms> resolvePlatforms(List<UUID> platformIds) {
+        Set<UUID> unique = new HashSet<>(platformIds);
+        if (unique.size() != platformIds.size()) {
+            throw new BusinessRuleException("Duplicate platform IDs provided");
         }
-        return null;
+        List<Platforms> result = new ArrayList<>();
+        for (UUID pid : platformIds) {
+            Platforms p = platformsRepository.findById(pid)
+                    .orElseThrow(() -> new EntityNotFoundException("Platform", pid));
+            result.add(p);
+        }
+        return result;
+    }
+
+    public GameResponse toResponse(Game game) {
+        GameResponse resp = new GameResponse();
+        resp.setId(game.getId());
+        resp.setName(game.getName());
+        resp.setClassification(game.getClassification());
+        resp.setGenres(game.getGenres());
+        resp.setDev(game.getDev());
+        resp.setCreatedAt(game.getCreatedAt());
+        resp.setUpdatedAt(game.getUpdatedAt());
+        if (game.getCreatedBy() != null) resp.setCreatedBy(game.getCreatedBy().getUsername());
+        if (game.getUpdatedBy() != null) resp.setUpdatedBy(game.getUpdatedBy().getUsername());
+
+        if (game.getDetails() != null) {
+            GameResponse.GameDetailsResponse det = new GameResponse.GameDetailsResponse();
+            det.setAbout(game.getDetails().getAbout());
+            det.setPublishYear(game.getDetails().getPublishYear());
+            resp.setDetails(det);
+        }
+
+        if (game.getPlatforms() != null) {
+            resp.setPlatforms(game.getPlatforms().stream()
+                    .map(Platforms::getName)
+                    .collect(Collectors.toList()));
+        }
+
+        return resp;
     }
 }
